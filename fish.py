@@ -43,6 +43,7 @@ def take_seat(fish_index, final_players):
 
 def select_seat(final_players):
     fishes = [
+        "cumicon",
     "Sashimi123",
     "Madvin",
     "John",
