@@ -125,11 +125,11 @@ for i in range(10):
 
 # Add the Save button
 save_button = tk.Button(root, text="Save", command=save_data)
-save_button.grid(row=3, column=7, columnspan=2, pady=20)
+save_button.grid(row=3, column=7, columnspan=2, pady=0)
 
 # Add the Add Row button
 add_row_button = tk.Button(root, text="Add Row", command=add_row)
-add_row_button.grid(row=4, column=7, columnspan=2, pady=20)
+add_row_button.grid(row=4, column=7, columnspan=2, pady=0)
 
 # Run the main event loop
 root.mainloop()
