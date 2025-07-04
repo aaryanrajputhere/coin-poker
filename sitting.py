@@ -1,75 +1,50 @@
-from PIL import ImageGrab
+from PIL import Image
 import pytesseract
-import cv2
-import numpy as np
-import time
-time.sleep(4)
-# Path to tesseract executable (update with your Tesseract-OCR path if needed)
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-# Function to perform OCR on an image
-def ocr_image_sitting(image):
-    # Convert image to grayscale
-    gray_image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2GRAY)
+pytesseract.pytesseract.tesseract_cmd = r'D:\opener\opener v2\resources\tesseract\tesseract.exe'  # Update this path based on your Tesseract installation
+
+def find_text_in_coordinates(image_path, coordinates, save_path):
+    # Open the image using Pillow
+    image = Image.open(image_path)
     
-    # Perform OCR using Tesseract
-    text = pytesseract.image_to_string(gray_image)
+    # Get the dimensions of the image
+    image_width, image_height = image.size
+    print(f"Image dimensions - Width: {image_width}, Height: {image_height}")
+
+    # Crop the image based on the given coordinates
+    left, top, right, bottom = coordinates
+    cropped_image = image.crop((left, top, right, bottom))
+
     
+    # Save the cropped image
+    cropped_image.save(save_path)
+    
+    # Use pytesseract to extract text from the cropped image
+    text = pytesseract.image_to_string(cropped_image)
+    
+    # Print the extracted text
+    print(f"Extracted text from coordinates {coordinates}:")
+   
     return text
 
-# Define the coordinates for multiple sets of seats
+image_path = "sitting7.jpg"
+save_path = "test.jpg"
+seats4 = [(210, 100 , 410 , 170),
+         (615, 100 , 815 , 170),
+         (615, 515 , 815 , 585),
+         (210, 515 , 410 , 585),
+         
+         ]
 
-# Function to count occurrences of 'Take' in a sublist
-def count_take(sublist):
-    return sum(1 for item in sublist if 'Take' in item)
+seats7 = [
+        (412, 90, 612, 160),      # Top-left seat
+        (805, 162, 1005, 230),     # Top-right seat
+        (813, 368, 1013, 440),     # Middle-right seat
+        (572, 500, 772, 570),     # Bottom-right seat
+        (247, 499, 447, 569),     # Bottom-left seat
+        (36, 372, 236, 442),      # Middle-left seat
+        (47, 168, 247, 238) 
+]
 
-# Function to extract player names and their seat coordinates from seat sets
-def extract_players_with_coords(seats_sets):
-    players_with_coords = []
-
-    for set_idx, seats in enumerate(seats_sets):
-        print(f"Processing Set {set_idx + 1}:")
-        player_with_coords = []
-        for i, (left, top, right, bottom) in enumerate(seats):
-            # Define the box coordinates (left, top, right, bottom)
-            box = (left, top, right, bottom)
-            
-            # Capture screenshot
-            screenshot = ImageGrab.grab(bbox=box)
-            
-            # Perform OCR on the screenshot
-            text = ocr_image_sitting(screenshot)
-            
-            # Print or use the extracted text
-            print(f"Text extracted from seat {i+1} in Set {set_idx + 1}:")
-            print(text)
-            print("---------------------------")
-            
-            player_with_coords.append((text, box))  # Collect text and box from each seat
-        players_with_coords.append(player_with_coords)
-    print("Text extraction complete.")
-    return players_with_coords
-
-# Main function to determine final players based on 'Take' occurrences
-def get_final_players_with_coords(seats_sets):
-    players_with_coords = extract_players_with_coords(seats_sets)
     
-    # Initialize variables to track maximum count and corresponding sublist
-    max_count = 0
-    max_sublist = None
-    
-    # Iterate through each sublist and find the one with the most 'Take' occurrences
-    for sublist in players_with_coords:
-        take_count = count_take([item[0] for item in sublist])  # Count 'Take' in player names
-        if take_count > max_count:
-            max_count = take_count
-            max_sublist = sublist
-    
-    # Return the sublist with the most 'Take' occurrences along with their seat coordinates
-    final_players_with_coords = [(player, box) for player, box in max_sublist] if max_sublist else []
-    print("Final players list with the most 'Take' occurrences:")
-    print(final_players_with_coords)
-    return final_players_with_coords
-
-# Example usage:
 
